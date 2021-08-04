@@ -36,7 +36,6 @@ public class NQueens {
         }
         for (int i = 0; i < nums.length; i++) {
             if ((path.contains(nums[i])) || ((path.size() > 0) && (Math.abs(nums[i] - path.getLast()) <= 1))) {
-
                 continue;
             }
             path.add(nums[i]);

@@ -1,10 +1,11 @@
+import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 
 public class BinaryTree {
-    private LinkedList<Node> res;
+    private LinkedList<TreeNode> res;
 
     public BinaryTree() {
+
         res = new LinkedList<>();
     }
 
@@ -16,7 +17,7 @@ public class BinaryTree {
         return vals;
     }
 
-    public void preOrder(Node root) {
+    public void preOrder(TreeNode root) {
         if (root == null) {
             return;
         }
@@ -25,7 +26,7 @@ public class BinaryTree {
         preOrder(root.right);
     }
 
-    public void inOrder(Node root) {
+    public void inOrder(TreeNode root) {
         if (root == null) {
             return;
         }
@@ -34,7 +35,7 @@ public class BinaryTree {
         preOrder(root.right);
     }
 
-    public void postOrder(Node root) {
+    public void postOrder(TreeNode root) {
         if (root == null) {
             return;
         }
@@ -43,27 +44,28 @@ public class BinaryTree {
         res.add(root);
     }
 
-    public void preOrderStack(Node root) {
+    public void preOrderStack(TreeNode root) {
         res.clear();
-        LinkedList<Node> stack = new LinkedList<>();
+        LinkedList<TreeNode> stack = new LinkedList<>();
         stack.addLast(root);
         while (!stack.isEmpty()) {
-            Node node = stack.removeLast();
+            TreeNode node = stack.removeLast();
             res.add(node);
             if (node.right != null) {
                 stack.addLast(node.right); //debug
             }
             if (node.left != null) {
                 stack.addLast(node.left);
+
             }
         }
     }
 
-    public void inOrderStack(Node root) {
+    public void inOrderStack(TreeNode root) {
         res.clear();
-        LinkedList<Node> stack = new LinkedList<>();
+        LinkedList<TreeNode> stack = new LinkedList<>();
         stack.addLast(root);
-        Node node = root.left;
+        TreeNode node = root.left;
         while (!stack.isEmpty() || node != null) { //debug
             while (node != null) {
                 stack.addLast(node);
@@ -75,13 +77,13 @@ public class BinaryTree {
         }
     }
 
-    public void postOrderStack(Node root) {
+    public void postOrderStack(TreeNode root) {
         res.clear();
-        LinkedList<Node> stack = new LinkedList<>();
+        LinkedList<TreeNode> stack = new LinkedList<>();
         stack.addLast(root);
-        Node pre = null;
+        TreeNode pre = null;
         while (!stack.isEmpty()) {
-            Node node = stack.getLast();
+            TreeNode node = stack.getLast();
             if (((node.left == null) && (node.right == null)) || ((pre != null) && ((pre == node.left) || (pre == node.right)))) {
                 res.add(node);
                 pre = node;
@@ -98,12 +100,12 @@ public class BinaryTree {
         }
     }
 
-    public void levelOrderStack(Node root) {
+    public void levelOrderStack(TreeNode root) {
         res.clear();
-        LinkedList<Node> queue = new LinkedList<>();
+        LinkedList<TreeNode> queue = new LinkedList<>();
         queue.addLast(root);
         while (!queue.isEmpty()) {
-            Node node = queue.removeFirst();
+            TreeNode node = queue.removeFirst();
             res.add(node);
             if (node.left != null) {
                 queue.addLast(node.left);
@@ -114,14 +116,14 @@ public class BinaryTree {
         }
     }
 
-    public int countNodes(Node root) {
+    public int countNodes(TreeNode root) {
         if (root == null) {
             return 0;
         }
         return countNodes(root.left) + 1 + countNodes(root.right);
     }
 
-    public int countLeaves(Node root) {
+    public int countLeaves(TreeNode root) {
         //int res = 0; //optimize
         if (root == null) {
             return 0;
@@ -132,14 +134,14 @@ public class BinaryTree {
         return countLeaves(root.left) + countLeaves(root.right);
     }
 
-    public int getDepth(Node root) {
+    public int getDepth(TreeNode root) {
         if (root == null) {
             return 0;
         }
         return Math.max(getDepth(root.left) + 1, getDepth(root.right) + 1);
     }
 
-    public int getKLevel(Node root, int k) { //default: k is valid
+    public int getKLevel(TreeNode root, int k) { //default: k is valid
         if (root == null) {
             return 0;
         }
@@ -149,7 +151,7 @@ public class BinaryTree {
         return getKLevel(root.left, k - 1) + getKLevel(root.right, k - 1);
     }
 
-    public boolean isSameTree(Node p, Node q) {
+    public boolean isSameTree(TreeNode p, TreeNode q) {
         if (p == null && q == null) {
             return true;
         }
@@ -159,11 +161,11 @@ public class BinaryTree {
         return isSameTree(p.left, q.left) && isSameTree(p.right, q.right);
     }
 
-    public Node invertTree(Node root) {
+    public TreeNode invertTree(TreeNode root) {
         if (root == null) {
             return null;
         }
-        Node left = root.left;
+        TreeNode left = root.left;
         root.left = root.right;
         root.right = left;
         root.left = invertTree(root.left);
@@ -171,15 +173,15 @@ public class BinaryTree {
         return root;
     }
 
-    public Node lowestCommonAncestor(Node root, Node p, Node q) {
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
         if (root == null) {
             return null;
         }
         if ((root == p) || (root == q)) {
             return root;
         }
-        Node left = lowestCommonAncestor(root.left, p, q);
-        Node right = lowestCommonAncestor(root.right, p, q);
+        TreeNode left = lowestCommonAncestor(root.left, p, q);
+        TreeNode right = lowestCommonAncestor(root.right, p, q);
 
         if ((left != null) && (right != null)) {
             return root;
@@ -190,6 +192,46 @@ public class BinaryTree {
         return right;
     }
 
+    public TreeNode buildTree(int[] preorder, int[] inorder) {
+        if (preorder.length == 0) {
+            return null;
+        }
+        TreeNode root = new TreeNode(preorder[0]);
+        HashMap<Integer, Integer> dictPre = new HashMap<>(); //val,index
+        HashMap<Integer, Integer> dictIn = new HashMap<>();
+        for (int i = 0; i < preorder.length; i++) {
+            dictPre.put(preorder[i], i);
+            dictIn.put(inorder[i], i);
+        }
+        return recur(preorder,inorder,dictPre,dictIn,root,0,preorder.length-1);
+    }
+
+    public TreeNode recur(int[] preorder, int[] inorder,
+                      HashMap<Integer, Integer> dictPre, HashMap<Integer, Integer> dictIn,
+                      TreeNode root, int left, int right) {
+        int midIndex = dictIn.get(root.val);
+        int leftCnt = midIndex - left;
+        int rightCnt = right - midIndex;
+        if (leftCnt > 0) {
+            root.left = new TreeNode(preorder[dictPre.get(root.val) + 1]);
+            root.left=recur(preorder,inorder,dictPre,dictIn,root.left, left, midIndex-1);
+        }
+        if (rightCnt > 0) {
+            root.right = new TreeNode(preorder[dictPre.get(root.val) + leftCnt + 1]);
+            root.right=recur(preorder,inorder,dictPre,dictIn,root.right, midIndex+1, right);
+        }
+        return root;
+    }
+
+    public int numWays(int n) {
+        int[] dp = new int[(n+1)];
+        dp[0]=0;
+        dp[1]=1;
+        for (int i=2;i<=n;i++){
+            dp[i]=dp[i-1]+dp[i-2];
+        }
+        return dp[n];
+    }
 
 
 }
